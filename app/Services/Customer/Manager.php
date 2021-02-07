@@ -2,6 +2,7 @@
 
 namespace App\Services\Customer;
 
+use Closure;
 use InvalidArgumentException;
 use Illuminate\Config\Repository;
 use Illuminate\Http\Client\Factory;
@@ -26,7 +27,7 @@ class Manager
     protected $customDrivers = [];
 
     /**
-     * @var \Illuminate\Config\Repository;
+     * @var \Illuminate\Config\Repository
      */
     protected $config;
 
@@ -36,18 +37,18 @@ class Manager
     protected $factory;
 
     /**
-     * Manager constructor
+     * Manager constructor.
      *
-     * @param \Illuminate\Contracts\Foundation\Application|Illuminate\Contracts\Container\Container $app
-     * @param \Illuminate\Config\Repository|null                                                    $config
-     * @param \Illuminate\Http\Client\Factory|null                                                  $factory
+     * @param \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Container\Container $app
+     * @param \Illuminate\Config\Repository|null                                                     $config
+     * @param \Illuminate\Http\Client\Factory|null                                                   $factory
      */
 
     public function __construct($app, Repository $config = null, Factory $factory = null)
     {
         $this->app = $app;
-        $this->config = $config;
-        $this->factory = $factory;
+        $this->config = $config ?? $this->app['config'];
+        $this->factory = $factory ?? $this->app[Factory::class];
     }
 
     public function setDefaultDriver($name): void
@@ -55,9 +56,16 @@ class Manager
         $this->config->set('customer.importer_default_driver', $name);
     }
 
-    public function getDefaultDriver()
+    public function getDefaultDriver() : string
     {
         return $this->config->get('customer.importer_default_driver');
+    }
+
+    public function extend($driver, Closure $callback) : Manager
+    {
+        $this->customDrivers[$driver] = $callback->bindTo($this, $this);
+
+        return $this;
     }
 
     /**
