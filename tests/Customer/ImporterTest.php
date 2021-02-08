@@ -3,6 +3,7 @@
 namespace Customer;
 
 use Mockery;
+use Stubs\ImporterClassStub;
 use TestCase;
 use function _\get;
 use App\Entities\Customer;
@@ -52,7 +53,6 @@ class ImporterTest extends TestCase
             'firstName' => 'John',
             'lastName' => 'Doe'
         ]);
-
         $manager = Mockery::mock(Manager::class);
         $manager->shouldReceive('results')->andReturn(new Collection([
             [
@@ -82,30 +82,7 @@ class ImporterTest extends TestCase
             $dispatcher
         );
 
-        $importerClass = new class implements ToImportContract {
-            const MALE = 'male';
-            const FEMALE = 'female';
-            public function toImport($row, Customer $customer = null) : Customer
-            {
-                $customer = ($customer ?? new Customer())
-                    ->setFirstName(get($row, 'name.first'))
-                    ->setLastName(get($row, 'name.last'))
-                    ->setUsername(get($row, 'login.username'))
-                    ->setGender(get($row, 'gender') == self::MALE ? 0 : 1)
-                    ->setCountry(get($row, 'location.country'))
-                    ->setCity(get($row, 'location.city'))
-                    ->setPhone(get($row, 'phone'))
-                    ->setPassword(get($row, 'login.md5'));
-
-                if ($customer !== null) {
-                    $customer->setEmail(get($row, 'email'));
-                }
-
-                return $customer;
-            }
-        };
-
-        $importer->import($importerClass);
+        $importer->import(ImporterClassStub::class);
 
         $this->seeInDatabase('customers', [
             'email' => 'email@example.com',
