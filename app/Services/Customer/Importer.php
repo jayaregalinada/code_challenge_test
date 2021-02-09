@@ -40,6 +40,7 @@ class Importer implements ImporterContract
     public function import($contract, array $options = []) : void
     {
         $results = $this->manager->results($options);
+        dd($results);
         $results->each(function ($result, $index) use ($contract) {
             $this->entityManager->persist(
                 $this->createOrUpdate($this->checkIfString($contract), $result)
@@ -74,7 +75,7 @@ class Importer implements ImporterContract
     protected function dispatchPersist($result, $index) : void
     {
         if ($this->dispatcher !== null) {
-            $this->dispatcher->dispatch('customer.import', compact('result', 'index'));
+            $this->dispatcher->dispatch(CustomerImportEvent::class, compact('result', 'index'));
         }
     }
 

@@ -7,8 +7,7 @@ use App\Entities\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /** @var \LaravelDoctrine\ORM\Testing\Factory $factory */
-$factory->define(Customer::class, function (Generator $faker, array $attributes = []) {
-    return [
+$factory->define(Customer::class, fn(Generator $faker, array $attributes = []) => [
         'firstName' => $attributes['first_name'] ?? $faker->firstName,
         'lastName' => $attributes['last_name'] ?? $faker->lastName,
         'username' => $attributes['username'] ?? $faker->userName,
@@ -18,5 +17,4 @@ $factory->define(Customer::class, function (Generator $faker, array $attributes 
         'phone' => $attributes['phone'] ?? $faker->phoneNumber,
         'password' => $attributes['password'] ?? $faker->md5,
         'email' => $attributes['email'] ?? $faker->unique()->email,
-    ];
-});
+    ]);

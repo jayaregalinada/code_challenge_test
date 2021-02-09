@@ -2,6 +2,9 @@
 
 namespace App\Services\Customer;
 
+use App\Services\Customer\Contracts\ClientContract;
+use App\Services\Customer\Drivers\RandomUserXmlDriver;
+use App\Services\Customer\Helpers\XmlParseHelper;
 use Closure;
 use InvalidArgumentException;
 use Illuminate\Config\Repository;
@@ -121,12 +124,21 @@ class Manager
         return $this->customDrivers[$config['driver']]($this->app, $config);
     }
 
-    private function createDefaultDriver(array $config)
+    private function createDefaultDriver(array $config): ClientContract
     {
-        return (new RandomUserClient(
-            $this->factory->baseUrl($config['url']),
+        return new RandomUserClient(
+            $this->factory->baseUrl($config['url'])->asForm(),
             $config
-        ));
+        );
+    }
+
+    private function createXmlDriver(array $config): ClientContract
+    {
+        return new RandomUserXmlDriver(
+            $this->factory->baseUrl($config['url'])->asForm(),
+            $this->app->make(XmlParseHelper::class),
+            $config
+        );
     }
 
 }

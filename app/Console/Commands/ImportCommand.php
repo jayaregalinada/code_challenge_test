@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\Customer\CustomerImportEvent;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use App\Services\Customer\Models\CustomerImport;
@@ -11,7 +12,9 @@ class ImportCommand extends Command
 {
     protected $description = 'Import users based on the given drivers';
 
-    protected $signature = 'customer:import {--c|count=50 : Count of users to import}';
+    protected $signature = 'customer:import
+                            {--c|count=50 : Count of users to import}
+                            {--driver : Driver to use}';
 
     public function handle(ImporterContract $importer, Dispatcher $dispatcher)
     {
@@ -26,7 +29,7 @@ class ImportCommand extends Command
 
     protected function advanceProgressBar($bar, $dispatcher)
     {
-        $dispatcher->listen('customer.import', function () use ($bar) {
+        $dispatcher->listen(CustomerImportEvent::class, function () use ($bar) {
             $bar->advance();
         });
     }

@@ -3,15 +3,16 @@
 namespace App\Providers;
 
 
-use Illuminate\Http\Client\Factory;
-use Illuminate\Support\ServiceProvider;
+use App\Services\Customer\Contracts\ImporterContract;
+use App\Services\Customer\Helpers\XmlParseHelper;
+use App\Services\Customer\Importer;
+use App\Services\Customer\Manager;
 use Doctrine\ORM\EntityManagerInterface;
+use DOMDocument;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\DeferrableProvider;
-
-use App\Services\Customer\Manager;
-use App\Services\Customer\Importer;
-use App\Services\Customer\Contracts\ImporterContract;
+use Illuminate\Http\Client\Factory;
+use Illuminate\Support\ServiceProvider;
 
 class CustomerServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -19,7 +20,7 @@ class CustomerServiceProvider extends ServiceProvider implements DeferrableProvi
     {
         $this->app->configure('customer');
 
-        $this->app->singleton('customer.manager', function($app) {
+        $this->app->singleton('customer.manager', function ($app) {
             return new Manager($app, $app->make('config'), $app->make(Factory::class));
         });
 
@@ -30,7 +31,7 @@ class CustomerServiceProvider extends ServiceProvider implements DeferrableProvi
                 $app->make(Dispatcher::class)
             );
         });
-
+        $this->app->singleton(XmlParseHelper::class, fn() => new XmlParseHelper(new DOMDocument()));
     }
 
     public function provides()

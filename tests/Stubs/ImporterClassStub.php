@@ -5,6 +5,7 @@ namespace Stubs;
 
 use App\Entities\Customer;
 use App\Services\Customer\Contracts\ToImportContract;
+use Illuminate\Support\Arr;
 use function _\get;
 
 class ImporterClassStub implements ToImportContract
@@ -17,7 +18,7 @@ class ImporterClassStub implements ToImportContract
     public function toImport($row, Customer $customer = null): Customer
     {
         $customer = ($customer ?? new Customer())
-            ->setFirstName(get($row, 'name.first'))
+            ->setFirstName(Arr::get($row, 'name.first'))
             ->setLastName(get($row, 'name.last'))
             ->setUsername(get($row, 'login.username'))
             ->setGender(get($row, 'gender') === 'male' ? 0 : 1)

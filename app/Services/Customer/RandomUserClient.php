@@ -19,6 +19,8 @@ class RandomUserClient implements ClientContract
      */
     protected $config;
 
+    private $parser;
+
     public function __construct(PendingRequest $request, array $config)
     {
         $this->request = $request;
@@ -31,7 +33,9 @@ class RandomUserClient implements ClientContract
             $this->config['version'],
             $this->generateQueryParams($options)
         );
-        return new Collection($request->json('results'));
+
+        return new Collection($this->parser->parse($request->body()));
+//        return new Collection($request->json('results'));
     }
 
     private function generateQueryParams(array $options)

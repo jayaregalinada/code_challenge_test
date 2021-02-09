@@ -4,7 +4,8 @@ namespace App\Services\Customer\Contracts;
 
 use App\Entities\Customer;
 
-interface ToImportContract{
+interface ToImportContract
+{
     /**
      * @param array|mixed                         $row
      *
